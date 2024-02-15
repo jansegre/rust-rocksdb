@@ -2209,6 +2209,11 @@ impl<I: DBInner> DBCommon<SingleThreaded, I> {
     pub fn cf_handle(&self, name: &str) -> Option<&ColumnFamily> {
         self.cfs.cfs.get(name)
     }
+
+    /// Returns a list of all column family handles
+    pub fn cf_handles(&self) -> Vec<&ColumnFamily> {
+        self.cfs.cfs.values().collect()
+    }
 }
 
 impl<I: DBInner> DBCommon<MultiThreaded, I> {
@@ -2241,6 +2246,18 @@ impl<I: DBInner> DBCommon<MultiThreaded, I> {
             .get(name)
             .cloned()
             .map(UnboundColumnFamily::bound_column_family)
+    }
+
+    /// Returns a list of all column family handles
+    pub fn cf_handles(&self) -> Vec<Arc<BoundColumnFamily>> {
+        self.cfs
+            .cfs
+            .read()
+            .unwrap()
+            .values()
+            .cloned()
+            .map(UnboundColumnFamily::bound_column_family)
+            .collect()
     }
 }
 
